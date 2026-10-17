@@ -191,7 +191,7 @@ https://www.tinkercad.com/things/itsZgUB0G57-chargegrid-intelligence?sharecode=r
 ## Sprint 4 — Solução Final Integrada GoodWe
 ---
 
-**1. Visão Geral do Projeto & Desafio GoodWe
+**1. Visão Geral do Projeto & Desafio GoodWe**
 
 O **ChargeGrid Intelligence** é uma plataforma de orquestração energética para eletropostos urbanos de recarga rápida. A solução integra o ecossistema de armazenamento de energia (BESS) e inversores fotovoltaicos da **GoodWe** com algoritmos proprietários de **Smart Charging** e **Tarifa Dinâmica**.
 
@@ -202,7 +202,7 @@ A arquitetura resolve gargalos críticos da mobilidade elétrica urbana:
 
 ---
 
-**2. Arquitetura de Integração End-to-End
+**2. Arquitetura de Integração End-to-End**
 
 ```text
 [ ENTRADAS DE DADOS ]            [ CONTROLADOR LOCAL (EDGE) ]             [ ECOSSISTEMA GOODWE & CLOUD ]
@@ -223,7 +223,7 @@ A arquitetura resolve gargalos críticos da mobilidade elétrica urbana:
 
 ---
 
-**3. Integração com Ecossistema GoodWe
+**3. Integração com Ecossistema GoodWe**
 
 1. Inversores Híbridos & Bateria Lynx Home/Commercial: O sistema opera com injeção direta de até 15 kW no barramento durante tarifas elevadas, reduzindo a solicitação junto à concessionária.
 2. Proteção Ativa de Ativos (SoC > 20%): O algoritmo C++ implementa uma trava de segurança que bloqueia o Peak Shaving caso o Estado de Carga (SoC) da Bateria Lynx atinja 20%, preservando a química e a vida útil das células de Lítio.
@@ -231,7 +231,7 @@ A arquitetura resolve gargalos críticos da mobilidade elétrica urbana:
 
 ---
 
-**4. Resultados Quantitativos e Qualitativos
+**4. Resultados Quantitativos e Qualitativos**
 
 Matriz de Comparação Operacional (Cenário de Sobecarga - 60kW solicitado)
 
@@ -246,7 +246,7 @@ Matriz de Comparação Operacional (Cenário de Sobecarga - 60kW solicitado)
 
 ---
 
-** 6. Links do Projeto
+** 6. Links do Projeto**
 
 - Simulação do Circuito no Tinkercad: https://www.tinkercad.com/things/itsZgUB0G57-chargegrid-intelligence?sharecode=rEB-arvSr9X3oIVoZrVsbl6MePTDojcdYvYG1lKRfcA
 - Vídeo Demonstrativo no Youtube: https://youtu.be/qGNm51wwaHI
