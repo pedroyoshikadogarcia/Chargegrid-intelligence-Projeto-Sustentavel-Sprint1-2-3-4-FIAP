@@ -185,3 +185,69 @@ https://www.tinkercad.com/things/itsZgUB0G57-chargegrid-intelligence?sharecode=r
 * **IoT e Edge Computing:** Programação embarcada em C++ no Arduino Uno manipulando entradas analógicas (potenciômetros) e saídas digitais/PWM sem o uso de rotinas bloqueantes (`millis`).
 * **Sustentabilidade e Gestão Energética:** Aplicação prática de *Peak Shaving* e BESS (Battery Energy Storage Systems) para alívio da malha elétrica urbana e redução da pegada de carbono.
 * **Automação de Processos:** Tomada de decisão autônoma em milissegundos substituindo a intervenção humana no controle de demanda de potência.
+
+---
+
+## Sprint 4 — Solução Final Integrada GoodWe
+---
+
+**1. Visão Geral do Projeto & Desafio GoodWe
+
+O **ChargeGrid Intelligence** é uma plataforma de orquestração energética para eletropostos urbanos de recarga rápida. A solução integra o ecossistema de armazenamento de energia (BESS) e inversores fotovoltaicos da **GoodWe** com algoritmos proprietários de **Smart Charging** e **Tarifa Dinâmica**.
+
+A arquitetura resolve gargalos críticos da mobilidade elétrica urbana:
+* **Prevenção de sobrecarga elétrica:** Elimina riscos de queda na rede e multas por ultrapassagem de demanda contratada com as concessionárias.
+* **Otimização do ecossistema GoodWe (Inversores Híbridos + Bateria Lynx):** Aplicação automatizada de *Peak Shaving* para injeção de energia barata nos horários de ponta.
+* **Telemetria e Ingestão Cloud:** Geração de dados estruturados em formato JSON para sincronização remota via API com o **GoodWe SEMS Portal**.
+
+---
+
+**2. Arquitetura de Integração End-to-End
+
+```text
+[ ENTRADAS DE DADOS ]            [ CONTROLADOR LOCAL (EDGE) ]             [ ECOSSISTEMA GOODWE & CLOUD ]
++---------------------+          +--------------------------+             +-------------------------------+
+| Potenciômetros (EVs)|--------->|                          |------------>| GoodWe SEMS Portal (Cloud)   |
+| Demanda 0 a 60 kW   |          |       Arduino Uno        | (JSON/Serial| Monitoramento de SoC % e BESS |
++---------------------+          | (Algoritmo Smart Charging|  Modbus/REST)-------------------------------+
+| Botão Concessionária|--------->|    e Peak Shaving C++)   |                            |
+| (Horário Pico/Normal|          +--------------------------+                            v
++---------------------+                       |                   +-------------------------------+
+                                              v                   | Gateway Python (Terminal)     |
+                                 +--------------------------+     |  - Economia em R$             |
+                                 | Actuadores & Sinalização |     |  - Redução de CO₂ (kg)        |
+                                 | LEDs (Verde, Amarelo,    |     |  - Processamento da Telemetria|
+                                 |       Azul e Vermelho)   |     +-------------------------------+
+                                 +--------------------------+
+```
+
+---
+
+**3. Integração com Ecossistema GoodWe
+
+1. Inversores Híbridos & Bateria Lynx Home/Commercial: O sistema opera com injeção direta de até 15 kW no barramento durante tarifas elevadas, reduzindo a solicitação junto à concessionária.
+2. Proteção Ativa de Ativos (SoC > 20%): O algoritmo C++ implementa uma trava de segurança que bloqueia o Peak Shaving caso o Estado de Carga (SoC) da Bateria Lynx atinja 20%, preservando a química e a vida útil das células de Lítio.
+3. Gateway de Telemetria IoT: O controlador gera payloads JSON serializados para permitir a ingestão direta por gateways de borda e integração com serviços Cloud da GoodWe via REST API ou Modbus TCP.
+
+---
+
+**4. Resultados Quantitativos e Qualitativos
+
+Matriz de Comparação Operacional (Cenário de Sobecarga - 60kW solicitado)
+
+| Métrica | Sem ChargeGrid / GoodWe | Com ChargeGrid Intelligence + GoodWe |
+| :--- | :--- | :--- |
+| **Demanda Exigida da Rede** | 60,00 kW (Ultrapassagem de limite) | **30,00 kW** (Dentro do contrato de 45 kW) |
+| **Injeção BESS GoodWe Lynx** | 0,00 kW | **15,00 kW** (Peak Shaving Ativo) |
+| **Carga Entregue por Carro** | 30,00 kW (Risco de blackout) | **22,50 kW** (Smart Charging rebalanceado) |
+| **Tarifa Ponderada kWh** | R$ 2,40 | **R$ 0,90** (Com uso da bateria/solar) |
+| **Multa por Ultrapassagem** | Aplicada (Alto Custo) | **R$ 0,00** (Eliminada 100%) |
+| **Redução de CO₂ por Carga** | 0 kg | **~3,82 kg de CO₂ evitado** por ciclo |
+
+---
+
+** 6. Links do Projeto
+
+- Simulação do Circuito no Tinkercad: https://www.tinkercad.com/things/itsZgUB0G57-chargegrid-intelligence?sharecode=rEB-arvSr9X3oIVoZrVsbl6MePTDojcdYvYG1lKRfcA
+- Vídeo Demonstrativo no Youtube: https://youtu.be/qGNm51wwaHI
+- Repositório do Projeto no GitHub: https://github.com/pedroyoshikadogarcia/Chargegrid-intelligence-Projeto-Sustentavel-Sprint1-2-3-4-FIAP
