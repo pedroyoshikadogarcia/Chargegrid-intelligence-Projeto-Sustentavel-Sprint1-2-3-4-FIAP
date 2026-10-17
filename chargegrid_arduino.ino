@@ -8,7 +8,10 @@ const int LED_AMARELO = 12;
 const int LED_VERMELHO = 13;
 
 const float LIMITE_CONTRATO = 45.0;
-const float BATERIA_MAX = 15.0;
+const float BATERIA_MAX_POTENCIA = 15.0;
+
+float bateriaSoC = 85.0; 
+float geracaoSolar = 12.5; 
 
 bool horarioPico = false;
 int estadoBotaoAnt = LOW;
@@ -24,14 +27,14 @@ void setup() {
   pinMode(LED_AMARELO, OUTPUT);
   pinMode(LED_VERMELHO, OUTPUT);
   
-  Serial.println("--- CHARGEGRID INTELLIGENCE v3.0 (INTEGRATED ESS) ---");
+  Serial.println("{\"system\":\"ChargeGrid Intelligence v4.0\",\"goodwe_status\":\"SEMS_CONNECTED\"}");
 }
 
 void loop() {
   int estadoBotao = digitalRead(BOTAO_PICO);
   if (estadoBotao == HIGH && estadoBotaoAnt == LOW) {
     horarioPico = !horarioPico;
-    delay(50);
+    delay(150);
   }
   estadoBotaoAnt = estadoBotao;
 
@@ -43,7 +46,7 @@ void loop() {
   float cargaRealCarro2 = demandaCarro2;
   float totalEntregue = totalSolicitado;
   bool controleAtivoAcionado = false;
-
+  
   if (totalSolicitado > LIMITE_CONTRATO) {
     controleAtivoAcionado = true;
     float fatorCorte = LIMITE_CONTRATO / totalSolicitado;
@@ -55,13 +58,12 @@ void loop() {
   float injecaoBateria = 0.0;
   bool bateriaAtiva = false;
 
-  if (horarioPico && totalEntregue > 0) {
+  if (horarioPico && totalEntregue > 0 && bateriaSoC > 20.0) {
     bateriaAtiva = true;
-    injecaoBateria = (totalEntregue < BATERIA_MAX) ? totalEntregue : BATERIA_MAX;
+    injecaoBateria = (totalEntregue < BATERIA_MAX_POTENCIA) ? totalEntregue : BATERIA_MAX_POTENCIA;
   }
 
   float cargaRede = totalEntregue - injecaoBateria;
-
   float precoKwh = horarioPico ? 2.40 : 0.90;
 
   digitalWrite(LED_AZUL, bateriaAtiva ? HIGH : LOW);
@@ -73,20 +75,24 @@ void loop() {
   if (tempoAtual - tempoAnterior >= intervaloExibicao) {
     tempoAnterior = tempoAtual;
 
-    Serial.println("\n=====================================");
-    Serial.print("STATUS DA REDE: ");
-    if (horarioPico) Serial.println("HORARIO DE PICO (Tarifa Elevada)");
-    else Serial.println("HORARIO NORMAL (Tarifa Reduzida)");
-    
-    Serial.print("Preco kWh: R$ "); Serial.println(precoKwh);
-    Serial.print("Injecao Bateria GoodWe Lynx: "); Serial.print(injecaoBateria); Serial.println(" kW (Peak Shaving)");
-    Serial.print("Demanda Exigida da Concessionaria: "); Serial.print(cargaRede); Serial.print(" / "); Serial.print(LIMITE_CONTRATO); Serial.println(" kW");
-    
-    Serial.print("Carro 1 -> Pedido: "); Serial.print(demandaCarro1); Serial.print("kW | Entregue: "); Serial.print(cargaRealCarro1); Serial.println("kW");
-    Serial.print("Carro 2 -> Pedido: "); Serial.print(demandaCarro2); Serial.print("kW | Entregue: "); Serial.print(cargaRealCarro2); Serial.println("kW");
-    
-    if (controleAtivoAcionado) {
-      Serial.println("ALERTA: CONTROLE ATIVO + BATERIA NO LIMITE! CORTE APLICADO.");
+    if (bateriaAtiva) {
+      bateriaSoC -= 0.5;
+      if (bateriaSoC < 0) bateriaSoC = 0;
     }
+
+    Serial.print("{\"horarioPico\":"); Serial.print(horarioPico ? "true" : "false");
+    Serial.print(",\"precoKwh\":"); Serial.print(precoKwh);
+    Serial.print(",\"demandaTotal\":"); Serial.print(totalSolicitado);
+    Serial.print(",\"cargaEntregue\":"); Serial.print(totalEntregue);
+    Serial.print(",\"injecaoGoodWe\":"); Serial.print(injecaoBateria);
+    Serial.print(",\"bateriaSoC\":"); Serial.print(bateriaSoC);
+    Serial.print(",\"geracaoSolar\":"); Serial.print(geracaoSolar);
+    Serial.print(",\"demandaRede\":"); Serial.print(cargaRede);
+    Serial.print(",\"carro1_req\":"); Serial.print(demandaCarro1);
+    Serial.print(",\"carro1_real\":"); Serial.print(cargaRealCarro1);
+    Serial.print(",\"carro2_req\":"); Serial.print(demandaCarro2);
+    Serial.print(",\"carro2_real\":"); Serial.print(cargaRealCarro2);
+    Serial.print(",\"smartChargingActive\":"); Serial.print(controleAtivoAcionado ? "true" : "false");
+    Serial.println("}");
   }
 }
